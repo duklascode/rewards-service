@@ -35,6 +35,13 @@ public class AccountRepository {
                 .one();
     }
 
+    public Mono<Account> findByIdForUpdate(String accountId) {
+        return db.sql("SELECT id, balance FROM points_account WHERE id = :id FOR UPDATE")
+                .bind("id", accountId)
+                .map(row -> new Account(row.get("id", String.class), row.get("balance", Long.class)))
+                .one();
+    }
+
     public Mono<Void> recordTransaction(String accountId, TransactionType type, long points) {
         return db.sql("INSERT INTO points_transaction (account_id, type, points) VALUES (:accountId, :type, :points)")
                 .bind("accountId", accountId)
